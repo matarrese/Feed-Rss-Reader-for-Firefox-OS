@@ -1,0 +1,621 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Rss Feed Reader</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<style type="text/css">
+	@import url(resources/buttons.css);
+	@import url(resources/input_areas.css);
+	@import url(resources/lists.css);
+	@import url(https://developer.mozilla.org/media/gaia/shared/style/headers.css);
+	@import url(https://developer.mozilla.org/media/gaia/shared/style_unstable/drawer.css); 
+
+	@import url(https://developer.mozilla.org/media/fonts.css); 
+
+
+
+	html, body { 
+		margin: 0; 
+		padding: 0; 
+		font-size: 10px; 
+		height: 100%; 
+		overflow-x: hidden; 
+		background-color: #000; 
+	/*	background-image: url(https://mdn.mozillademos.org/files/4655/fx_logo_white_backdrop.jpg); 
+	*/	background-attachment: fixed; 
+	} 
+
+#feedP {
+overflow: visible;
+
+
+}
+
+	body { 
+		background: none; 
+		} section[role="region"] {
+			height: 100%;
+			font: 1.2rem/1em "MozTT", Sans-serif;
+		}
+
+		div[role="main"] {
+			background: #fff;
+			
+			height: 100% ;
+				overflow: hidden;
+		
+		}
+
+		div[role="main"] p {
+			margin: 2rem 2.5rem;
+		}
+
+[data-type="list"] ul {
+    list-style: none outside none;
+    margin: 0;
+    overflow: visible;
+    padding: 0;
+}
+
+		div[role="main"] h3 {
+			margin: 2rem 2.5rem;
+		}
+		div[role="main"] h5 {
+			margin: 0rem 0rem;
+			
+		}
+
+		div[role="main"] form {
+			margin: 2rem 2.5rem;
+		}
+
+		div[role="main"] table {
+			margin: 0px 10px;
+		}
+
+		div[role="main"] table li {
+			margin: 0px 10px;
+			font: 1.3rem/1em "MozTT", Sans-serif;
+		}
+
+
+		/* Base icons */
+		section[data-type="sidebar"] > header .icon.icon-add {
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2hpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8xMi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo4RTlFMTExOTIwMjA2ODExODIyQUJFQTc4MUU4NEEyOSIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpENjM1MzgyMUJGNzAxMUUxQkNDOEUwRkExQ0U5N0Q0QiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpENjM1MzgyMEJGNzAxMUUxQkNDOEUwRkExQ0U5N0Q0QiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChNYWNpbnRvc2gpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6Mzk0RjYxOUMzMTIwNjgxMTgyMkFBRjgxQ0IyNTAxM0UiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OEU5RTExMTkyMDIwNjgxMTgyMkFCRUE3ODFFODRBMjkiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz45ZU6fAAAAiklEQVR42mL8//8/w0AAJoYBAqMW0w2wkKmPH4hVoOw7QPyRVAMYyUzVD4FYDsq+DMR6o3E8avGoxbiykxAQ78KjTxeI2aDs70B8DY9aZ2z5HJfFIIMvUclzGkB8c9AXmU+B+CyVgvrFaJE5avGoxQNSZBICzEBsAGVfAOK/9LJ4NI5HLSYIAAIMAKfZJ7+0GO5HAAAAAElFTkSuQmCC);
+		}
+		</style>
+
+		<style>
+#install_button span{	display: block;
+}	
+#install_button {
+	
+	margin-top: 5px;
+	margin-right: 3px;
+  padding-top: 3px;
+
+position: relative;
+float: right;
+font: normal normal bold 6pt/normal Helvetica;
+font-size: 8px;
+vertical-align: middle;
+text-align: center;
+letter-spacing: -0.5px;
+color: rgb(255,255,255);
+text-shadow: 0px 1px rgba(0, 0, 0, 0.3);
+width: 50px;
+height: 28px;
+line-height: 26px;
+border: 1px solid rgba(0,0,0,0.2);
+
+-moz-border-radius: 1em;
+-webkit-border-radius: 1em;
+border-radius: 1em;
+
+-moz-box-shadow:
+inset rgba(218,255,191,1) 0 1px 0px,
+inset rgba(0,0,0,0.2) 0 -2px 0px,
+rgba(0,0,0,0.1) 0 2px 0px;
+-webkit-box-shadow:
+inset rgba(218,255,191,1) 0 1px 0px,
+inset rgba(0,0,0,0.2) 0 -2px 0px,
+rgba(0,0,0,0.1) 0 2px 0px;
+-box-shadow:
+inset rgba(218,255,191,1) 0 1px 0px,
+inset rgba(0,0,0,0.2) 0 -2px 0px,
+rgba(0,0,0,0.1) 0 2px 0px;
+
+background-color: rgb(134,214,106); /* for non-css3 browsers */
+background: -webkit-gradient(linear, left top, left bottom, from(rgba(134,214,106,1)), to(rgba(78,152,52,1))); /* for webkit browsers */
+background: -moz-linear-gradient(top, rgba(134,214,106,1), rgba(78,152,52,1)); /* for firefox 3.6+ */
+
+
+display: block;
+}
+</style>
+		<style>
+
+		a { color: #0068D2; cursor: pointer; font: 2rem "MozTT", Sans-serif;}
+		a:link, a:visited { text-decoration: none; color: #0068D2; }
+		a:hover, a:active { text-decoration: underline; color: #0068D2; }
+
+	/*	body { font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", sans-serif; }
+
+		#contacts-table { border-collapse: collapse; }
+		#contacts-table, #contacts-table th, #contacts-table td { padding: 8px 16px; text-align: left; border: 0px solid #B9BABE; }
+		
+		#contacts-table tr:nth-child(2n) { background: #E8EDFF; }
+
+		#contacts-form { padding: 10px; }
+		.text input, .button input { padding: 5px; margin: 0; border: 1px solid #ccc; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
+		#contacts-form .item { margin: 3px 0; }
+		#contacts-form label, #contacts-form .field { display: inline-block; color: #0C0B07; }
+		#contacts-form label { width: 110px; font-weight: bold; text-align: right; color: #666; }
+		#contacts-form .text input { width: 176px; padding: 3px; }
+	/*	#contacts-form .button { display: inline-block; } 
+		#contacts-form .button-wrapper { padding-left: 113px; }
+		.button input { padding: 4px 8px; color: #343434; background-color: #fdfdfd; background: -moz-linear-gradient(#fdfdfd, #e1e1e1); background: -webkit-gradient(linear, 0 0, 0 100%, from(#fdfdfd), to(#e1e1e1)); }
+		.button-default input { font-weight: bold; color: #fff; background-color: #7ca0c7; background: -moz-linear-gradient(#acc6e1, #7ca0c7); background: -webkit-gradient(linear, 0 0, 0 100%, from(#acc6e1), to(#7ca0c7)); border-color: #5b80b2; }
+		*/	</style>
+
+ <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script type="text/javascript">
+
+google.load("feeds", "1");
+
+
+function getFeed(url) {
+//	alert(url);
+
+	document.getElementById("roleMain").style.overflow = "visible" ;
+	document.getElementById("roleMain").style.height ="auto";
+  var feed = new google.feeds.Feed(url);
+
+    feed.setNumEntries(20);
+ //  feed.setNumEntries(20);
+  feed.load(function(result) {
+    if (!result.error) {
+
+    	document.getElementById("titleFeed").innerHTML = result.feed.title;
+ //     alert(result.feed.entries[10].title);
+     var container = document.getElementById("listFeed");
+
+  container.innerHTML = '';
+  container.value ="";
+      for (var i = 0; i < result.feed.entries.length; i++) {
+    //	 for (var i = 0; i < 19; i++) {
+
+        var entry = result.feed.entries[i];
+  //       	console.log( entry.title);
+        var div = document.createElement("li");
+
+div.innerHTML ="<a href=" + entry.link+" ><p>" + entry.title+ "</p></a>" ;
+
+//        div.appendChild(document.createTextNode(entry.title));
+       container.appendChild(div);
+      }
+    }
+  });
+}
+//google.setOnLoadCallback(initialize);
+
+</script>
+
+	</head>
+	<script src="jquery-1.10.1.min.js"></script>
+	
+
+	<body>
+		<section data-type="sidebar">
+			<header>
+				<menu type="toolbar">
+    <!--  <a href="#"><span class="icon icon-add">add</span></a>
+-->
+
+</menu>
+   <!-- <h1>Title <em>(9)</em></h1>
+-->
+<h1>Your subscribed feed</h1>
+</header>
+<nav>
+	<ul id="listF">
+	<!--	<li><a href="#">label</a></li>
+		<li><a href="#">label</a></li>
+		<li><a href="#">label</a></li>
+		<li><a href="#">label</a></li>
+-->
+<li><a href="#" data-op="modify">...manage your RSS</a></li>	</ul>
+ <!--   <h2>Subtitle</h2>
+    <ul>
+      <li><a href="#">label</a></li>
+      <li><a href="#">label</a></li>
+      <li><a href="#">label larger label than the </a></li>
+      <li><a href="#">label</a></li>
+    </ul>
+-->
+</nav>
+</section> <section id="drawer" role="region">
+<header>
+	<a href="#"><span class="icon icon-menu">hide sidebar</span></a>
+	<a href="#drawer"><span class="icon icon-menu">show sidebar</span></a>
+	<div id="install_button" style="display:none;float:right">
+   <span>INSTALL</span></div>
+	<h1>Feed Reader</h1>
+	
+</header>
+<div role="main" id="roleMain" >
+	<div id="editP">
+<!--   <h5 id="status" ></h5>
+    <h3>
+      Add your feed
+    </h3>
+
+    <form>
+    <input type="text" id="feed" value="http://">
+    <p></p>
+    <button class="recommend" roles="button" id="go">Add</button>
+</form>
+-->
+
+<table id="contacts-table">
+	<tr id="contacts-head">
+
+		<th style="width:200px">Feed Name</th>
+	<!--	<th>Feed Url</th>
+-->
+		<th> </th>
+	</tr>
+</table>
+
+<form id="contacts-form">
+	<div class="item text">
+		<h5>Feed Name:</h5>
+		<div class="field"><input type="text" name="feed_name" /></div>
+	</div>
+	<div class="item text">
+		<h5>Feed Url:</h5>
+		<div class="field"><input type="text" name="feed_url" /></div>
+	</div>
+	<div class="button-wrapper">
+		
+<!--
+			<input class="danger" roles="button" type="button" id="contacts-op-discard" value="Discard" />
+		-->
+		<button class="danger" roles="button" id="contacts-op-discard" style="display:none" >Discard</button>		
+
+		
+
+
+			<!--	<input class="recommend" roles="button" type="submit" id="contacts-op-save" value="Save" />-->
+			<button class="recommend" roles="button" id="contacts-op-save">Add</button>
+
+		
+	</div>
+	<input type="hidden" name="id_entry" value="0" />
+</form>
+</div>
+
+<div id="feedP" role="application" style="display:none">
+
+	<section data-type="list">
+	<header id="titleFeed">Title</header>
+		<ul id="listFeed"><!--	
+			<li>
+				<p>Margherita <strong>Gomez</strong></p>
+			</li>
+			<li>
+				<a href="#">
+					<p>Margherita Clickable <strong>Gomez</strong></p>
+				</a>
+			</li>
+			<li>
+				<aside class="pack-end">
+					<img alt="placeholder" src="myimage.jpg">
+				</aside>
+				<a href="#">
+					<p>Margherita <strong>Gomez</strong></p>
+					
+				</a>
+			</li>
+		</ul>
+	<ul>
+			<li>
+				<p>Margherita <strong>Gomez</strong></p>
+			</li>
+			<li>
+				<a href="#">
+					<p>Margherita Clickable <strong>Gomez</strong></p>
+				</a>
+			</li>
+			<li>
+				<aside class="pack-end">
+					<img alt="placeholder" src="myimage.jpg">
+				</aside>
+				<a href="#">
+					<p>Margherita <strong>Gomez</strong></p>
+					
+				</a>
+			</li>
+			<li>
+				<p>Margherita <strong>Gomez</strong></p>
+			</li>
+			<li>
+				<a href="#">
+					<p>Margherita Clickable <strong>Gomez</strong></p>
+				</a>
+			</li>
+			<li>
+				<aside class="pack-end">
+					<img alt="placeholder" src="myimage.jpg">
+				</aside>
+				<a href="#">
+					<p>Margherita <strong>Gomez</strong></p>
+					
+				</a>
+			</li>-->
+		</ul>
+	</section>
+
+
+</div>
+
+</div>
+</section>
+
+
+
+
+
+
+<script>
+var Contacts = {
+	index: window.localStorage.getItem("Contacts:index"),
+	$table: document.getElementById("contacts-table"),
+	$listF:  document.getElementById("listF"),
+	$form: document.getElementById("contacts-form"),
+	$button_save: document.getElementById("contacts-op-save"),
+	$button_discard: document.getElementById("contacts-op-discard"),
+
+	init: function() {
+				// initialize storage index
+				if (!Contacts.index) {
+					window.localStorage.setItem("Contacts:index", Contacts.index = 1);
+				}
+
+				// initialize form
+				Contacts.$form.reset();
+				Contacts.$button_discard.addEventListener("click", function(event) {
+					Contacts.$form.reset();
+					Contacts.$form.id_entry.value = 0;
+				}, true);
+				Contacts.$form.addEventListener("submit", function(event) {
+					var entry = {
+						id: parseInt(this.id_entry.value),
+					//	first_name: this.first_name.value,
+				//		last_name: this.last_name.value,
+				//		email: this.email.value
+				feed_name: this.feed_name.value,
+				feed_url: this.feed_url.value
+
+			};
+					if (entry.id == 0) { // add
+						Contacts.storeAdd(entry);
+						Contacts.tableAdd(entry);
+					}
+					else { // edit
+						Contacts.storeEdit(entry);
+						Contacts.tableEdit(entry);
+					}
+
+					this.reset();
+					this.id_entry.value = 0;
+					event.preventDefault();
+				}, true);
+
+				// initialize table
+				if (window.localStorage.length - 1) {
+					var contacts_list = [], i, key;
+					for (i = 0; i < window.localStorage.length; i++) {
+						key = window.localStorage.key(i);
+						if (/Contacts:\d+/.test(key)) {
+							contacts_list.push(JSON.parse(window.localStorage.getItem(key)));
+						}
+					}
+
+					if (contacts_list.length) {
+						contacts_list
+						.sort(function(a, b) {
+							return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+						})
+						.forEach(Contacts.tableAdd);
+					}
+				}
+				Contacts.$table.addEventListener("click", function(event) {
+					var op = event.target.getAttribute("data-op");
+					if (/edit|remove/.test(op)) {
+						var entry = JSON.parse(window.localStorage.getItem("Contacts:"+ event.target.getAttribute("data-id")));
+						if (op == "edit") {
+						//	Contacts.$form.first_name.value = entry.first_name;
+						Contacts.$form.feed.value = entry.feed;
+						//	Contacts.$form.last_name.value = entry.last_name;
+						//	Contacts.$form.email.value = entry.email;
+						Contacts.$form.id_entry.value = entry.id;
+					}
+					else if (op == "remove") {
+						if (confirm('Are you sure you want to remove "'+ entry.feed_name +'" from your feeds?')) {
+							Contacts.storeRemove(entry);
+							Contacts.tableRemove(entry);
+						}
+					}
+					event.preventDefault();
+				}
+			}, true);
+
+
+
+				Contacts.$listF.addEventListener("click", function(event) {
+
+	var op = event.target.getAttribute("data-op");
+	if (op =="modify"){
+		document.getElementById("editP").style.display= "block";
+document.getElementById("feedP").style.display= "none";
+document.getElementById("roleMain").style.overflow = "idden" ;
+	document.getElementById("roleMain").style.height ="100%";
+	}else{
+document.getElementById("editP").style.display= "none";
+document.getElementById("feedP").style.display= "block";
+			//			alert(event);
+	var entry = JSON.parse(window.localStorage.getItem("Contacts:"+ event.target.getAttribute("data-id")));
+	//alert(entry.feed_url);
+				//	event.preventDefault();
+		
+getFeed(entry.feed_url);
+
+}
+
+			}, true);
+
+
+
+
+
+
+
+			},
+
+			storeAdd: function(entry) {
+				entry.id = Contacts.index;
+				window.localStorage.setItem("Contacts:index", ++Contacts.index);
+				window.localStorage.setItem("Contacts:"+ entry.id, JSON.stringify(entry));
+			},
+			storeEdit: function(entry) {
+				window.localStorage.setItem("Feeds:"+ entry.id, JSON.stringify(entry));
+			},
+			storeRemove: function(entry) {
+				window.localStorage.removeItem("Contacts:"+ entry.id);
+			},
+
+			tableAdd: function(entry) {
+				var $tr = document.createElement("tr"), $td, key;
+				var $li = document.createElement("li");
+
+				$li.innerHTML ="<a href=\"#\" data-id=\""+ entry.id + "\" >" + entry.feed_name + "</a>" ;
+			//	for (key in entry) {
+				//	if (entry.hasOwnProperty(key)) {
+						$td = document.createElement("td");
+					//	$td.appendChild(document.createTextNode(entry[key]));
+			//		$td.appendChild(document.createTextNode(entry.feed_name));
+$td.innerHTML = "<li>" + entry.feed_name + "</li>";
+
+
+						$tr.appendChild($td);
+				//	}
+			//	}
+				$td = document.createElement("td");
+			//	$td.innerHTML = '<a data-op="edit" data-id="'+ entry.id +'">Edit</a> | <a data-op="remove" data-id="'+ entry.id +'">Remove</a>';
+			$td.innerHTML = '<a data-op="remove" data-id="'+ entry.id +'">Remove</a>';
+			$tr.appendChild($td);
+			$tr.setAttribute("id", "entry-"+ entry.id);
+			$li.setAttribute("id", "entryLi-"+ entry.id);
+			Contacts.$table.appendChild($tr);
+
+
+
+			Contacts.$listF.appendChild($li);
+		},
+		tableEdit: function(entry) {
+			var $tr = document.getElementById("entry-"+ entry.id), $td, key;
+			$tr.innerHTML = "";
+			for (key in entry) {
+				if (entry.hasOwnProperty(key)) {
+					$td = document.createElement("td");
+					$p = document.createElement("h4");
+					$p.appendChild(document.createTextNode(entry[key]));
+					td.appendChild(p);
+					$tr.appendChild($td);
+				}
+			}
+			$td = document.createElement("td");
+			$td.innerHTML = '<a data-op="edit" data-id="'+ entry.id +'">Edit</a> | <a data-op="remove" data-id="'+ entry.id +'">Remove</a>';
+			$tr.appendChild($td);
+		},
+		tableRemove: function(entry) {
+			Contacts.$table.removeChild(document.getElementById("entry-"+ entry.id));
+			Contacts.$listF.removeChild(document.getElementById("entryLi-"+ entry.id));
+		}
+	};
+	Contacts.init();
+
+
+
+	// Our callback function, for when a feed is loaded.
+function feedLoaded(result) {
+  if (!result.error) {
+  	console.log(result);
+    // Grab the container we will put the results into
+ //   var container = document.getElementById("content");
+  //  container.innerHTML = '';
+
+    // Loop through the feeds, putting the titles onto the page.
+    // Check out the result object for a list of properties returned in each entry.
+    // http://code.google.com/apis/ajaxfeeds/documentation/reference.html#JSON
+   // for (var i = 0; i < result.feed.entries.length; i++) {
+    //  var entry = result.feed.entries[i];
+    //  var div = document.createElement("div");
+    //  div.appendChild(document.createTextNode(entry.title));
+    //  container.appendChild(div);
+   // }
+  }
+}
+	</script>
+
+
+<script>
+
+//var gManifestName = "http://localhost:8888/feed/manifest.webapp";
+var gManifestName = "https://dl.dropboxusercontent.com/u/3186527/feed/manifest.webapp";
+$(document).ready(function() {
+  var request = navigator.mozApps.getSelf();
+request.onsuccess = function() {
+if (request.result) {
+// we're installed
+  $("#install_button").innerHTML ='';
+//$("#install_button").text("INSTALLED!").show();
+$("#install_button").style.display ="none";
+
+} else {
+// not installed
+$("#install_button").show();
+            $("#install_button").click(function() {
+            
+var req = navigator.mozApps.install(gManifestName);
+req.onsuccess = function() {
+	//  $("#install_button").innerHTML ='';
+                  $("#install_button").text("THANKS!").unbind('click');
+
+                  $("#install_button").style.display= "none";
+                      $("#install_button").style.display= '';
+ remove(install_button);
+                }
+req.onerror = function(errObj) {
+                    alert("Couldn't install (" + errObj.code + ") " + errObj.message);
+                }
+            });
+}
+}
+request.onerror = function() {
+alert('Error checking installation status: ' + this.error.message);
+}
+});
+
+
+function remove(id)
+{
+    return (elem=document.getElementById(id)).parentNode.removeChild(elem);
+}
+</script>
+
+</body>
+</html>

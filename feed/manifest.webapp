@@ -1,0 +1,13 @@
+{
+  "name": "Feed Reader Firefox",
+  "description": "Rss Feed Reader for Firefox",
+  "launch_path": "https://dl.dropboxusercontent.com/u/3186527/feed/index.html",
+  "icons": {
+    "128": "https://dl.dropboxusercontent.com/u/3186527/feed/resources/icon.png"
+  },
+  "developer": {
+    "name": "Antonio",
+    "url": "http://www.github.com/amatarrese"
+  },
+  "default_locale": "en"
+}
